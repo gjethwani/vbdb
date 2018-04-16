@@ -18,3 +18,4 @@
 Route::get('/vbdb/login', 'UserController@login');
 Route::post('/vbdb/login', 'UserController@authenticateUser');
 Route::get('/vbdb/inventory', 'InventoryController@showInventory');
+Route::post('/vbdb/inventory', 'InventoryController@filterInventory');
