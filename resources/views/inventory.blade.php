@@ -1,10 +1,12 @@
 @extends('main-layout')
 @section('title', 'Inventory')
 @section('content')
-  <form action='/vbdb/inventory' method='post' id='filterRules'>
+  <form action='/vbdb/inventory' method='post'>
     {{csrf_field()}}
     <input type='hidden' id='numberRuleTracker' name='numberRuleTracker' value='0'>
     <input type='hidden' id='textRuleTracker' name='textRuleTracker' value='0'>
+    <div id='filterRules'>
+    </div>
     <button type='submit'>Submit</button>
   </form>
   <button class='btn btn-primary' onclick='return addNumberRule();'>Add Number rule</button>
@@ -30,6 +32,7 @@
       <th>Status</th>
       <th>Updated At</th>
       <th>Created At</th>
+      <th>Action</th>
     </tr>
     @foreach ($inventory as $product)
       <tr>
@@ -72,7 +75,13 @@
             {{$product->notes}}
           @endif
         </td>
-        <td>{{$product->distributed}}</td>
+        <td>
+          @if ($product->distributed == 1)
+            Yes
+          @else
+            No
+          @endif
+        </td>
         <td>{{$product->status}}</td>
         <td>
           @if (isset($product->updated_at))
@@ -84,9 +93,101 @@
             {{$product->created_at}}
           @endif
         </td>
+        <td>
+          <button class='btn btn-primary'>Edit</button>
+          <button class='btn btn-primary'>Delete</button>
+        </td>
       </tr>
     @endforeach
+    <tr>
+      <td> <!-- category -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- brand -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- name -->
+        <input type='text' name='insert' id='nameField'>
+      </td>
+      <td> <!-- payment -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- colour -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- US Size -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- cost -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- source -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- selling price -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- profit -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- unrealised sales value -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- realised profit -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- buyer -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- location -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- notes -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- distributed -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- status -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- updated at -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- created at -->
+        <input type='text' name='insert'>
+      </td>
+      <td> <!-- action -->
+        <button class='btn btn-primary'>Insert</button>
+      </td>
+    </tr>
   </table>
+  <script>
+    var allData = JSON.parse('{!! json_encode($inventory) !!}');
+    function autocomplete(column, query) {
+    /*  var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+             // Typical action to be performed when the document is ready:
+             console.log(xhttp.responseText);
+          }
+      };
+      xhttp.open('GET', '/vbdb/autocomplete?column=' + column + '&query=' + query, true);
+      xhttp.send();*/
+      var toReturn = [];
+      for (var i = 0; i < allData.length; i++) {
+        if (allData[i][column].indexOf(query) !== -1) {
+          toReturn.push(allData[i][column]);
+        }
+      }
+      console.log(toReturn);
+      return toReturn;
+    }
+    document.getElementById('nameField').oninput = function() {
+      return autocomplete('itemName',document.getElementById('nameField').value);
+    };
+    //document.getElementById('nameField').addEventListener('change',autocomplete('itemName',document.getElementById('nameField').value,false));
+  </script>
 @endsection
 <script>
   var numberRuleTracker = 0;
@@ -143,12 +244,21 @@
     valueTag.type = 'number';
     valueTag.value = 0;
 
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = 'Delete';
+    deleteButton.onclick = function(event) {
+      event.preventDefault();
+      this.parentElement.style.display = 'none';
+      numberRuleTracker--;
+    };
+
     var divTag = document.createElement('div');
     divTag.classList.add('form-group');
 
     divTag.appendChild(fieldTag);
     divTag.appendChild(operatorTag);
     divTag.appendChild(valueTag);
+    divTag.appendChild(deleteButton);
     document.getElementById('filterRules').appendChild(divTag);
     numberRuleTracker++;
     document.getElementById('numberRuleTracker').value = numberRuleTracker;
@@ -217,14 +327,24 @@
     valueTag.name = 'textValue' + textRuleTracker;
     valueTag.type = 'text';
 
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = 'Delete';
+    deleteButton.onclick = function(event) {
+      event.preventDefault();
+      this.parentElement.style.display = 'none';
+      textRuleTracker--;
+    };
+
     var divTag = document.createElement('div');
     divTag.classList.add('form-group');
 
     divTag.appendChild(fieldTag);
     divTag.appendChild(operatorTag);
     divTag.appendChild(valueTag);
+    divTag.appendChild(deleteButton);
     document.getElementById('filterRules').appendChild(divTag);
     textRuleTracker++
     document.getElementById('textRuleTracker').value = textRuleTracker;
   }
+
 </script>

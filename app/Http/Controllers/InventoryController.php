@@ -10,7 +10,6 @@ class InventoryController extends Controller
 {
     public function showInventory() {
       $allInventory = Inventory::all();
-      //dd($allInventory->itemName);
       return view('inventory', [
         'inventory' => $allInventory
       ]);
@@ -45,17 +44,33 @@ class InventoryController extends Controller
         if ($operator == '=') {
           $query = $query . $request->input($fieldName) . ' ' . $request->input($operatorName) . ' "' . $request->input($valueName) . '"';
         } else {
-          $query = $query . $request->input($fieldName) . ' LIKE  %"' . $request->input($valueName) . '"%';
+          $query = $query . $request->input($fieldName) . ' LIKE  "%' . $request->input($valueName) . '%"';
         }
         if ($i != $textRuleTracker - 1) {
           $query = $query . ' AND ';
         }
       }
       $results = DB::select(DB::raw($query));
-      //dd($query);
       return view('inventory', [
         'inventory' => $results
       ]);
-      //dd($results);
+    }
+
+    public function autocomplete(Request $request) {
+      $column = $request->input('column');
+      $term = $request->input('query');
+
+      $results = array();
+
+      $queries = DB::table('inventory')
+        ->select($column)
+        ->where($column, 'LIKE', '%'.$term.'%')
+        ->take(5)->get();
+
+      foreach ($queries as $query)
+      {
+          $results[] = [ 'suggestion' => $query];
+      }
+      return json_encode($results);
     }
 }
