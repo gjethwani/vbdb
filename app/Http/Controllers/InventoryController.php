@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Inventory;
+use App\User;
+use Auth;
 use DB;
 
 class InventoryController extends Controller
@@ -11,7 +13,8 @@ class InventoryController extends Controller
     public function showInventory() {
       $allInventory = Inventory::all();
       return view('inventory', [
-        'inventory' => $allInventory
+        'inventory' => $allInventory,
+        'showAllInventoryButton' => false
       ]);
     }
 
@@ -50,9 +53,11 @@ class InventoryController extends Controller
           $query = $query . ' AND ';
         }
       }
+      //dd($query);
       $results = DB::select(DB::raw($query));
       return view('inventory', [
-        'inventory' => $results
+        'inventory' => $results,
+        'showAllInventoryButton' => true
       ]);
     }
 
@@ -72,5 +77,39 @@ class InventoryController extends Controller
           $results[] = [ 'suggestion' => $query];
       }
       return json_encode($results);
+    }
+
+    public function insert(Request $request) {
+      $quantity = $request->input('quantity');
+      for ($i = 0; $i < $quantity; $i++) {
+          $newProduct = new Inventory;
+          $newProduct->category = $request->input('category');
+          $newProduct->brand = $request->input('brand');
+          $newProduct->itemName = $request->input('itemName');
+          $newProduct->payment = $request->input('payment');
+          $newProduct->colour = $request->input('colour');
+          $newProduct->usSize = $request->input('usSize');
+          $newProduct->cost = $request->input('cost');
+          $newProduct->source = $request->input('source');
+          $newProduct->sellingPrice = $request->input('sellingPrice');
+          $newProduct->profit = $request->input('profit');
+          $newProduct->unrealisedSalesValue = $request->input('unrealisedSalesValue');
+          $newProduct->realisedProfit = $request->input('realisedProfit');
+          $newProduct->buyer = $request->input('buyer');
+          $newProduct->location = $request->input('location');
+          $newProduct->notes = $request->input('notes');
+          $newProduct->distributed = $request->input('distributed');
+          $newProduct->status = $request->input('status');
+          $newProduct->updated_at = $request->input('updatedAt');
+          $newProduct->created_at = $request->input('createdAt');
+          //dd(Auth::user());
+          //dd(Auth::id() . ' ' . User::find(Auth::id()));
+          $newProduct->save();
+      }
+      return redirect('/vbdb/inventory');
+    }
+
+    public function delete($id) {
+      DB::table('inventory')->where('id', '=', $id)->delete();
     }
 }

@@ -1,16 +1,39 @@
 @extends('main-layout')
 @section('title', 'Inventory')
 @section('content')
-  <form action='/vbdb/inventory' method='post'>
+  <style>
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f1f1f1;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .show {
+      display:block;
+    }
+    .dropdown-content p:hover {
+      background-color: #ddd;
+    }
+  </style>
+  @if ($showAllInventoryButton)
+    <div>
+      <button style='float: right' class='btn btn-primary'><a href='/vbdb/inventory' style='color:white;text-decoration: none;'>Show All Inventory</a></button>
+    </div>
+  @endif
+  <button class='btn btn-primary' onclick='return scrollToBottom();' style='position: fixed'>Scroll To Top</button>
+  <button class='btn btn-primary' onclick='return scrollToTop();' style='position: fixed; margin-left: 127px;'>Scroll To Bottom</button>
+  <form action='/vbdb/inventory' method='post' id='filterForm' style='display: inline-block; margin-top: 50px;'>
     {{csrf_field()}}
     <input type='hidden' id='numberRuleTracker' name='numberRuleTracker' value='0'>
     <input type='hidden' id='textRuleTracker' name='textRuleTracker' value='0'>
     <div id='filterRules'>
     </div>
     <button type='submit'>Submit</button>
+    <button class='btn btn-primary' onclick='return addNumberRule();'type='button'>Add Number rule</button>
+    <button class='btn btn-primary' onclick='return addTextRule();' type='button'>Add Text rule</button>
   </form>
-  <button class='btn btn-primary' onclick='return addNumberRule();'>Add Number rule</button>
-  <button class='btn btn-primary' onclick='return addTextRule();'>Add Text rule</button>
   <table class='table'>
     <tr>
       <th>Category</th>
@@ -35,7 +58,7 @@
       <th>Action</th>
     </tr>
     @foreach ($inventory as $product)
-      <tr>
+      <tr id='{{$product->id}}'>
         <td>
           @if (isset($product->category))
             {{$product->category}}
@@ -94,102 +117,197 @@
           @endif
         </td>
         <td>
-          <button class='btn btn-primary'>Edit</button>
-          <button class='btn btn-primary'>Delete</button>
+          <button class='btn btn-primary' onclick='return editRow({{$product->id}})'>Edit</button>
+          <button class='btn btn-primary' onclick='return deleteRow({{$product->id}})'>Delete</button>
         </td>
       </tr>
     @endforeach
     <tr>
-      <td> <!-- category -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- brand -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- name -->
-        <input type='text' name='insert' id='nameField'>
-      </td>
-      <td> <!-- payment -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- colour -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- US Size -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- cost -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- source -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- selling price -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- profit -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- unrealised sales value -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- realised profit -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- buyer -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- location -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- notes -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- distributed -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- status -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- updated at -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- created at -->
-        <input type='text' name='insert'>
-      </td>
-      <td> <!-- action -->
-        <button class='btn btn-primary'>Insert</button>
-      </td>
+      <form action='/vbdb/insert' method='post' autocomplete='off'>
+        {{csrf_field()}}
+        <td> <!-- category -->
+          <input type='text' name='category' id='category' class='input'>
+          <div id='categoryAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- brand -->
+          <input type='text' name='brand' id='brand' class='input'>
+          <div id='brandAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- name -->
+          <input type='text' name='itemName' id='itemName' class='input'>
+          <div id='itemNameAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- payment -->
+          <input type='text' name='payment' id='payment' class='input'>
+          <div id='paymentAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- colour -->
+          <input type='text' name='colour' id='colour' class='input'>
+          <div id='colourAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- US Size -->
+          <input type='text' name='usSize'>
+        </td>
+        <td> <!-- cost -->
+          <input type='number' name='cost'>
+        </td>
+        <td> <!-- source -->
+          <input type='text' name='source' id='source' class='input'>
+          <div id='sourceAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- selling price -->
+          <input type='number' name='sellingPrice'>
+        </td>
+        <td> <!-- profit -->
+          <input type='number' name='profit'>
+        </td>
+        <td> <!-- unrealised sales value -->
+          <input type='number' name='unrealisedSalesValue'>
+        </td>
+        <td> <!-- realised profit -->
+          <input type='number' name='realisedProfit'>
+        </td>
+        <td> <!-- buyer -->
+          <input type='text' name='buyer' id='buyer' class='input'>
+          <div id='buyerAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- location -->
+          <input type='text' name='location' id='location' class='input'>
+          <div id='locationAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- notes -->
+          <input type='text' name='notes' id='notes' class='input'>
+          <div id='notesAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- distributed -->
+          <input type='text' name='distributed'>
+        </td>
+        <td> <!-- status -->
+          <input type='text' name='status' id='status' class='input'>
+          <div id='statusAutoComplete' class='dropdown-content'></div>
+        </td>
+        <td> <!-- updated at -->
+          <input type='text' name='updatedAt'>
+        </td>
+        <td> <!-- created at -->
+          <input type='text' name='createdAt'>
+        </td>
+        <td> <!-- action -->
+          <input type='number' name='quantity'>
+          <button class='btn btn-primary'>Insert</button>
+        </td>
+      </form>
     </tr>
   </table>
-  <script>
+  <script> <!-- deleting code -->
+    function deleteRow(id) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // Typical action to be performed when the document is ready:
+          document.getElementById(id).style.display = 'none';
+        }
+      };
+      xhttp.open('GET', '/vbdb/delete/' + id, true);
+      xhttp.send();
+    }
+  </script>
+  <script> <!-- editing code -->
+    function editRow(id) {
+        var tr = document.getElementById(id);
+        for (var j = 0, col; col = tr.cells[j]; j++) {
+          //iterate through columns
+          //columns would be accessed using the "col" variable assigned in the for loop
+          col.innerHTML = '<input type="text">'
+        }
+    }
+  </script>
+  <script> <!-- drop down code -->
     var allData = JSON.parse('{!! json_encode($inventory) !!}');
     function autocomplete(column, query) {
-    /*  var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-             // Typical action to be performed when the document is ready:
-             console.log(xhttp.responseText);
-          }
-      };
-      xhttp.open('GET', '/vbdb/autocomplete?column=' + column + '&query=' + query, true);
-      xhttp.send();*/
       var toReturn = [];
       for (var i = 0; i < allData.length; i++) {
-        if (allData[i][column].indexOf(query) !== -1) {
-          toReturn.push(allData[i][column]);
+      //  console.log(allData[i][column]);
+        if (allData[i][column] != null && (allData[i][column].toLowerCase()).indexOf(query.toLowerCase()) !== -1) {
+          if (!toReturn.includes(allData[i][column])) {
+            toReturn.push(allData[i][column]);
+          }
         }
       }
-      console.log(toReturn);
+    //  console.log(toReturn);
+      var dropDown = document.getElementById(column + 'AutoComplete');
+      dropDown.innerHTML = '';
+      for (var i = 0; i < toReturn.length; i++) {
+        var dropDownOption = document.createElement('p');
+        dropDownOption.innerHTML = toReturn[i];
+        var temp = toReturn[i];
+        dropDownOption.onclick = (event) => {
+          if (document.getElementById(column + 'AutoComplete').classList.contains('show')) {
+            document.getElementById(column).value = event.path[0].innerHTML;
+          }
+        };
+        dropDown.appendChild(dropDownOption);
+      }
+      showAutocompleteDropdown(column);
       return toReturn;
     }
-    document.getElementById('nameField').oninput = function() {
-      return autocomplete('itemName',document.getElementById('nameField').value);
+    document.getElementById('category').oninput = function() {
+      return autocomplete('category',document.getElementById('category').value);
     };
-    //document.getElementById('nameField').addEventListener('change',autocomplete('itemName',document.getElementById('nameField').value,false));
+    document.getElementById('brand').oninput = function() {
+      return autocomplete('brand',document.getElementById('brand').value);
+    };
+    document.getElementById('itemName').oninput = function() {
+      return autocomplete('itemName',document.getElementById('itemName').value);
+    };
+    document.getElementById('payment').oninput = function() {
+      return autocomplete('payment',document.getElementById('payment').value);
+    };
+    document.getElementById('colour').oninput = function() {
+      return autocomplete('colour',document.getElementById('colour').value);
+    };
+    document.getElementById('source').oninput = function() {
+      return autocomplete('source',document.getElementById('source').value);
+    };
+    document.getElementById('buyer').oninput = function() {
+      return autocomplete('buyer',document.getElementById('buyer').value);
+    };
+    document.getElementById('location').oninput = function() {
+      return autocomplete('location',document.getElementById('location').value);
+    };
+    document.getElementById('notes').oninput = function() {
+      return autocomplete('notes',document.getElementById('notes').value);
+    };
+    document.getElementById('status').oninput = function() {
+      return autocomplete('status',document.getElementById('status').value);
+    };
+    function showAutocompleteDropdown(column) {
+      if (!document.getElementById(column + 'AutoComplete').classList.contains('show')) {
+        document.getElementById(column + 'AutoComplete').classList.add('show');
+      }
+
+    }
+
+    // Close the dropdown menu if the user clicks outside of it
+    window.onclick = function(event) {
+      if (!event.target.matches('.input')) {
+
+        var dropdowns = document.getElementsByClassName('dropdown-content');
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    };
+
+
+    /* DELETE */
   </script>
 @endsection
-<script>
+<script> <!-- Code for filter rules -->
   var numberRuleTracker = 0;
   var textRuleTracker = 0;
   function addNumberRule() {
@@ -250,6 +368,7 @@
       event.preventDefault();
       this.parentElement.style.display = 'none';
       numberRuleTracker--;
+      document.getElementById('numberRuleTracker').value = numberRuleTracker;
     };
 
     var divTag = document.createElement('div');
@@ -275,7 +394,7 @@
     brandTag.value = 'brand';
     var nameTag = document.createElement('option');
     nameTag.innerHTML = 'Name';
-    nameTag.value = 'name';
+    nameTag.value = 'itemName';
     var paymentTag = document.createElement('option');
     paymentTag.innerHTML = 'Payment';
     paymentTag.value = 'payment';
@@ -333,6 +452,10 @@
       event.preventDefault();
       this.parentElement.style.display = 'none';
       textRuleTracker--;
+      document.getElementById('textRuleTracker').value = textRuleTracker;
+      var parent = document.getElementById('filterRules');
+      parent.removeChild(this.parentNode);
+      //var field =
     };
 
     var divTag = document.createElement('div');
@@ -347,4 +470,11 @@
     document.getElementById('textRuleTracker').value = textRuleTracker;
   }
 
+  function scrollToBottom() {
+    window.scrollTo(0, 0);
+  }
+
+  function scrollToTop() {
+    window.scrollTo(0,document.body.scrollHeight);
+  }
 </script>
