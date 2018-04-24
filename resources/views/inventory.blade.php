@@ -123,82 +123,84 @@
         </td>
       </tr>
     @endforeach
-    <tr>
-      <form action='/vbdb/insert' method='post' autocomplete='off'>
-        {{csrf_field()}}
-        <td> <!-- category -->
-          <input type='text' name='category' id='category' class='input'>
-          <div id='categoryAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- brand -->
-          <input type='text' name='brand' id='brand' class='input'>
-          <div id='brandAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- name -->
-          <input type='text' name='itemName' id='itemName' class='input'>
-          <div id='itemNameAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- payment -->
-          <input type='text' name='payment' id='payment' class='input'>
-          <div id='paymentAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- colour -->
-          <input type='text' name='colour' id='colour' class='input'>
-          <div id='colourAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- US Size -->
-          <input type='text' name='usSize'>
-        </td>
-        <td> <!-- cost -->
-          <input type='number' name='cost'>
-        </td>
-        <td> <!-- source -->
-          <input type='text' name='source' id='source' class='input'>
-          <div id='sourceAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- selling price -->
-          <input type='number' name='sellingPrice'>
-        </td>
-        <td> <!-- profit -->
-          <input type='number' name='profit'>
-        </td>
-        <td> <!-- unrealised sales value -->
-          <input type='number' name='unrealisedSalesValue'>
-        </td>
-        <td> <!-- realised profit -->
-          <input type='number' name='realisedProfit'>
-        </td>
-        <td> <!-- buyer -->
-          <input type='text' name='buyer' id='buyer' class='input'>
-          <div id='buyerAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- location -->
-          <input type='text' name='location' id='location' class='input'>
-          <div id='locationAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- notes -->
-          <input type='text' name='notes' id='notes' class='input'>
-          <div id='notesAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- distributed -->
-          <input type='text' name='distributed'>
-        </td>
-        <td> <!-- status -->
-          <input type='text' name='status' id='status' class='input'>
-          <div id='statusAutoComplete' class='dropdown-content'></div>
-        </td>
-        <td> <!-- updated at -->
-          <input type='text' name='updatedAt'>
-        </td>
-        <td> <!-- created at -->
-          <input type='text' name='createdAt'>
-        </td>
-        <td> <!-- action -->
-          <input type='number' name='quantity'>
-          <button class='btn btn-primary'>Insert</button>
-        </td>
-      </form>
-    </tr>
+    @if ($showAllInventoryButton == false)
+      <tr>
+        <form action='/vbdb/insert' method='post' autocomplete='off'>
+          {{csrf_field()}}
+          <td> <!-- category -->
+            <input type='text' name='category' id='autocomplete-category' class='input'>
+            <div id='categoryAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- brand -->
+            <input type='text' name='brand' id='autocomplete-brand' class='input'>
+            <div id='brandAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- name -->
+            <input type='text' name='itemName' id='autocomplete-itemName' class='input'>
+            <div id='itemNameAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- payment -->
+            <input type='text' name='payment' id='autocomplete-payment' class='input'>
+            <div id='paymentAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- colour -->
+            <input type='text' name='colour' id='autocomplete-colour' class='input'>
+            <div id='colourAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- US Size -->
+            <input type='text' name='usSize'>
+          </td>
+          <td> <!-- cost -->
+            <input type='number' name='cost'>
+          </td>
+          <td> <!-- source -->
+            <input type='text' name='source' id='autocomplete-source' class='input'>
+            <div id='sourceAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- selling price -->
+            <input type='number' name='sellingPrice'>
+          </td>
+          <td> <!-- profit -->
+            <input type='number' name='profit'>
+          </td>
+          <td> <!-- unrealised sales value -->
+            <input type='number' name='unrealisedSalesValue'>
+          </td>
+          <td> <!-- realised profit -->
+            <input type='number' name='realisedProfit'>
+          </td>
+          <td> <!-- buyer -->
+            <input type='text' name='buyer' id='autocomplete-buyer' class='input'>
+            <div id='buyerAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- location -->
+            <input type='text' name='location' id='autocomplete-location' class='input'>
+            <div id='locationAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- notes -->
+            <input type='text' name='notes' id='autocomplete-notes' class='input'>
+            <div id='notesAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- distributed -->
+            <input type='text' name='distributed'>
+          </td>
+          <td> <!-- status -->
+            <input type='text' name='status' id='autocomplete-status' class='input'>
+            <div id='statusAutoComplete' class='dropdown-content'></div>
+          </td>
+          <td> <!-- updated at -->
+            <input type='text' name='updatedAt'>
+          </td>
+          <td> <!-- created at -->
+            <input type='text' name='createdAt'>
+          </td>
+          <td> <!-- action -->
+            <input type='number' name='quantity'>
+            <button class='btn btn-primary'>Insert</button>
+          </td>
+        </form>
+      </tr>
+    @endif
   </table>
   <script> <!-- deleting code -->
     function deleteRow(id) {
@@ -347,7 +349,7 @@
         var temp = toReturn[i];
         dropDownOption.onclick = (event) => {
           if (document.getElementById(column + 'AutoComplete').classList.contains('show')) {
-            document.getElementById(column).value = event.path[0].innerHTML;
+            document.getElementById('autocomplete-' + column).value = event.path[0].innerHTML;
           }
         };
         dropDown.appendChild(dropDownOption);
@@ -355,35 +357,35 @@
       showAutocompleteDropdown(column);
       return toReturn;
     }
-    document.getElementById('category').oninput = function() {
-      return autocomplete('category',document.getElementById('category').value);
+    document.getElementById('autocomplete-category').oninput = function() {
+      return autocomplete('category',document.getElementById('autocomplete-category').value);
     };
-    document.getElementById('brand').oninput = function() {
-      return autocomplete('brand',document.getElementById('brand').value);
+    document.getElementById('autocomplete-brand').oninput = function() {
+      return autocomplete('brand',document.getElementById('autocomplete-brand').value);
     };
-    document.getElementById('itemName').oninput = function() {
-      return autocomplete('itemName',document.getElementById('itemName').value);
+    document.getElementById('autocomplete-itemName').oninput = function() {
+      return autocomplete('itemName',document.getElementById('autocomplete-itemName').value);
     };
-    document.getElementById('payment').oninput = function() {
-      return autocomplete('payment',document.getElementById('payment').value);
+    document.getElementById('autocomplete-payment').oninput = function() {
+      return autocomplete('payment',document.getElementById('autocomplete-payment').value);
     };
-    document.getElementById('colour').oninput = function() {
-      return autocomplete('colour',document.getElementById('colour').value);
+    document.getElementById('autocomplete-colour').oninput = function() {
+      return autocomplete('colour',document.getElementById('autocomplete-colour').value);
     };
-    document.getElementById('source').oninput = function() {
-      return autocomplete('source',document.getElementById('source').value);
+    document.getElementById('autocomplete-source').oninput = function() {
+      return autocomplete('source',document.getElementById('autocomplete-source').value);
     };
-    document.getElementById('buyer').oninput = function() {
-      return autocomplete('buyer',document.getElementById('buyer').value);
+    document.getElementById('autocomplete-buyer').oninput = function() {
+      return autocomplete('buyer',document.getElementById('autocomplete-buyer').value);
     };
-    document.getElementById('location').oninput = function() {
-      return autocomplete('location',document.getElementById('location').value);
+    document.getElementById('autocomplete-location').oninput = function() {
+      return autocomplete('location',document.getElementById('autocomplete-location').value);
     };
-    document.getElementById('notes').oninput = function() {
-      return autocomplete('notes',document.getElementById('notes').value);
+    document.getElementById('autocomplete-notes').oninput = function() {
+      return autocomplete('notes',document.getElementById('autocomplete-notes').value);
     };
-    document.getElementById('status').oninput = function() {
-      return autocomplete('status',document.getElementById('status').value);
+    document.getElementById('autocomplete-status').oninput = function() {
+      return autocomplete('status',document.getElementById('autocomplete-status').value);
     };
     function showAutocompleteDropdown(column) {
       if (!document.getElementById(column + 'AutoComplete').classList.contains('show')) {
