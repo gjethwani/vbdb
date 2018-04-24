@@ -36,87 +36,88 @@
   </form>
   <table class='table'>
     <tr>
-      <th>Category</th>
-      <th>Brand</th>
-      <th>Name</th>
-      <th>Payment</th>
-      <th>Colour</th>
-      <th>US Size</th>
-      <th>Cost</th>
-      <th>Source</th>
-      <th>Selling Price</th>
-      <th>Profit</th>
-      <th>Unrealised Sales Value</th>
-      <th>Realised Profit</th>
-      <th>Buyer</th>
-      <th>Location</th>
-      <th>Notes</th>
-      <th>Distributed</th>
-      <th>Status</th>
-      <th>Updated At</th>
-      <th>Created At</th>
+      <th id='category'>Category</th>
+      <th id='brand'>Brand</th>
+      <th id='itemName'>Name</th>
+      <th id='payment'>Payment</th>
+      <th id='colour'>Colour</th>
+      <th id='usSize'>US Size</th>
+      <th id='cost'>Cost</th>
+      <th id='source'>Source</th>
+      <th id='sellingPrice'>Selling Price</th>
+      <th id='profit'>Profit</th>
+      <th id='unrealisedSalesProfit'>Unrealised Sales Value</th>
+      <th id='realisedProfit'>Realised Profit</th>
+      <th id='buyer'>Buyer</th>
+      <th id='location'>Location</th>
+      <th id='notes'>Notes</th>
+      <th id='distributed'>Distributed</th>
+      <th id='status'>Status</th>
+      <th id='updated_at'>Updated At</th>
+      <th id='created_at'>Created At</th>
       <th>Action</th>
     </tr>
     @foreach ($inventory as $product)
       <tr id='{{$product->id}}'>
-        <td>
-          @if (isset($product->category))
-            {{$product->category}}
-          @endif
-        </td>
-        <td>
-          @if (isset($product->brand))
-            {{$product->brand}}
-          @endif
-        </td>
-        <td>{{$product->itemName}}</td>
-        <td>{{$product->payment}}</td>
-        <td>
-          @if (isset($product->colour))
-            {{$product->colour}}
-          @endif
-        </td>
-        <td>{{$product->usSize}}</td>
-        <td>{{$product->cost}}</td>
-        <td>{{$product->source}}</td>
-        <td>{{$product->sellingPrice}}</td>
-        <td>{{$product->profit}}</td>
-        <td>{{$product->unrealisedSalesValue}}</td>
-        <td>{{$product->realisedProfit}}</td>
-        <td>
-          @if (isset($product->buyer))
-            {{$product->buyer}}
-          @endif
-        </td>
-        <td>
-          @if (isset($product->location))
-            {{$product->location}}
-          @endif
-        </td>
-        <td>
-          @if (isset($product->notes))
-            {{$product->notes}}
-          @endif
-        </td>
-        <td>
-          @if ($product->distributed == 1)
-            Yes
-          @else
-            No
-          @endif
-        </td>
-        <td>{{$product->status}}</td>
-        <td>
-          @if (isset($product->updated_at))
-            {{$product->updated_at}}
-          @endif
-        </td>
-        <td>
-          @if (isset($product->created_at))
-            {{$product->created_at}}
-          @endif
-        </td>
-        <td>
+        <!--<form id='editForm'>-->
+          <td>
+            @if (isset($product->category))
+              {{$product->category}}
+            @endif
+          </td>
+          <td>
+            @if (isset($product->brand))
+              {{$product->brand}}
+            @endif
+          </td>
+          <td>{{$product->itemName}}</td>
+          <td>{{$product->payment}}</td>
+          <td>
+            @if (isset($product->colour))
+              {{$product->colour}}
+            @endif
+          </td>
+          <td>{{$product->usSize}}</td>
+          <td>{{$product->cost}}</td>
+          <td>{{$product->source}}</td>
+          <td>{{$product->sellingPrice}}</td>
+          <td>{{$product->profit}}</td>
+          <td>{{$product->unrealisedSalesValue}}</td>
+          <td>{{$product->realisedProfit}}</td>
+          <td>
+            @if (isset($product->buyer))
+              {{$product->buyer}}
+            @endif
+          </td>
+          <td>
+            @if (isset($product->location))
+              {{$product->location}}
+            @endif
+          </td>
+          <td>
+            @if (isset($product->notes))
+              {{$product->notes}}
+            @endif
+          </td>
+          <td>
+            @if (isset($product->distributed))
+              {{$product->distributed}}
+            @endif
+          </td>
+          <td>{{$product->status}}</td>
+          <td>
+            @if (isset($product->updated_at))
+              {{$product->updated_at}}
+            @endif
+          </td>
+          <td>
+            @if (isset($product->created_at))
+              {{$product->created_at}}
+            @endif
+          </td>
+          <td>
+          <button class='btn btn-primary' type='button' onclick='return submitEdit({{$product->id}})' style='display: none;'>Save</button>
+        <!--</form>-->
           <button class='btn btn-primary' onclick='return editRow({{$product->id}})'>Edit</button>
           <button class='btn btn-primary' onclick='return deleteRow({{$product->id}})'>Delete</button>
         </td>
@@ -213,13 +214,116 @@
     }
   </script>
   <script> <!-- editing code -->
+    var currentlyEditing = false;
     function editRow(id) {
+        if (currentlyEditing) {
+          return;
+        }
+        currentlyEditing = true;
         var tr = document.getElementById(id);
         for (var j = 0, col; col = tr.cells[j]; j++) {
           //iterate through columns
           //columns would be accessed using the "col" variable assigned in the for loop
-          col.innerHTML = '<input type="text">'
+          var children = col.children;
+          if (children.length != 3) {
+            var value = col.innerHTML.trim();
+            if (j == 6 || j == 8 || j == 9 || j == 10 || j == 11) {
+              col.innerHTML = '<input type="number" value="' + value + '" id="edit' + col.parentElement.parentElement.children[0].children[j].id  + '" onchange="return fieldChanged(`' + col.parentElement.parentElement.children[0].children[j].id + '`)">'; //big name statement access column headers
+            } else {
+              col.innerHTML = '<input type="text" value="' + value + '" id="edit' + col.parentElement.parentElement.children[0].children[j].id  + '" onchange="return fieldChanged(`' + col.parentElement.parentElement.children[0].children[j].id + '`)">';
+            }
+        } else {
+          children[0].style.display = 'inline-block';
+          children[1].style.display = 'none';
         }
+      }
+    }
+
+    var changedFields = new Set();
+
+    function fieldChanged(field) {
+      changedFields.add(field);
+    }
+
+    function submitEdit(id) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            currentlyEditing = false;
+             // Typical action to be performed when the document is ready:
+             var response = JSON.parse(xhttp.responseText);
+             var tr = document.getElementById(id);
+             for (var j = 0, col; col = tr.cells[j]; j++) { //iterate through cells
+               if (col.children.length === 3) {
+                 col.children[0].style.display = 'none';
+                 col.children[1].style.display = 'inline-block';
+               } else {
+                 var tdId = col.children[0].id;
+                 col.innerHTML = response[tdId.substring(4)];
+               }
+
+               //iterate through columns
+               //columns would be accessed using the "col" variable assigned in the for loop
+               /*var children = col.children
+               var i = 1;
+               for (var key in response) { //iterate through json response
+                 //console.log('here');
+                 if (children.length == 3) {
+                   children[0].style.display = 'none';
+                   children[1].style.display = 'block';
+                 }
+                 if (response.hasOwnProperty(key)) {
+                   if (key === 'id' || key === 'toWhack') {
+                     continue;
+                   } else {
+                     children[i].innerHTML = response[key];
+                   }
+                   i++;
+                   //console.log(key + " -> " + newObject[key]);
+                 }
+               }*/
+            /*   if (children.length != 3) {
+                 col.innerHTML = response[i];
+               }*/
+             }
+          }
+      };
+      /*var category = form.elements.namedItem('category');
+      var brand = form.elements.namedItem('brand');
+      var itemName = form.elements.namedItem('itemName');
+      var payment = form.elements.namedItem('payment');
+      var colour = form.elements.namedItem('colour');
+      var usSize = form.elements.namedItem('usSize');
+      var cost = form.elements.namedItem('cost');
+      var source = form.elements.namedItem('source');
+      var sellingPrice = form.elements.namedItem('sellingPrice');
+      var profit = form.elements.namedItem('profit');
+      var unrealisedSalesValue = form.elements.namedItem('unrealisedSalesValue');
+      var realisedProfit = form.elements.namedItem('realisedProfit');
+      var buyer = form.elements.namedItem('buyer');
+      var location = form.elements.namedItem('location');
+      var notes = form.elements.namedItem('notes');
+      var distributed = form.elements.namedItem('distributed');*/
+      var url = '/vbdb/edit/' + id + '?';
+      var changedFieldsIterator = changedFields.values();
+      if (changedFields.size > 0) {
+        for (var i = 0; i < changedFields.size; i++) {
+          var currValue = changedFieldsIterator.next().value;
+          var fieldId = 'edit' + currValue;
+          url += currValue
+          url += '=';
+          if (document.getElementById(fieldId).value == null) {
+            url += '%20';
+          } else {
+            url += document.getElementById(fieldId).value;
+          }
+          url += '&';
+        }
+      }
+      url += '_token='
+      url += '{{csrf_token()}}';
+      xhttp.open('GET', url, true);
+      xhttp.send();
     }
   </script>
   <script> <!-- drop down code -->

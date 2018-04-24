@@ -112,4 +112,69 @@ class InventoryController extends Controller
     public function delete($id) {
       DB::table('inventory')->where('id', '=', $id)->delete();
     }
+
+    public function edit(Request $request, $id) {
+      $toEdit = Inventory::find($id);
+      if ($request->input('category') != null) {
+        $toEdit->category = $request->input('category');
+      }
+      if ($request->input('brand') != null) {
+        $toEdit->brand = $request->input('brand');
+      }
+      if ($request->input('itemName') != null) {
+        $toEdit->itemName = $request->input('itemName');
+      }
+      if ($request->input('payment') != null) {
+        //dd('here payment');
+        $toEdit->payment = $request->input('payment');
+      }
+      if ($request->input('colour') != null) {
+        $toEdit->colour = $request->input('colour');
+      }
+      if ($request->input('usSize') != null) {
+        $toEdit->usSize = $request->input('usSize');
+      }
+      if ($request->input('cost') != null) {
+        $toEdit->cost = $request->input('cost');
+      }
+      if ($request->input('source') != null) {
+        $toEdit->source = $request->input('source');
+      }
+      if ($request->input('sellingPrice') != null) {
+        $toEdit->sellingPrice = $request->input('sellingPrice');
+      }
+      if ($request->input('profit') != null) {
+        $toEdit->profit = $request->input('profit');
+      }
+      if ($request->input('unrealisedSalesValue') != null) {
+        $toEdit->unrealisedSalesValue = $request->input('unrealisedSalesValue');
+      }
+      if ($request->input('realisedProfit') != null) {
+        $toEdit->realisedProfit = $request->input('realisedProfit');
+      }
+      if ($request->input('buyer') != null) {
+        $toEdit->buyer = $request->input('buyer');
+      }
+      if ($request->input('location') != null) {
+        $toEdit->location = $request->input('location');
+      }
+      if ($request->input('notes') != null) {
+        $toEdit->notes = $request->input('notes');
+      }
+      if ($request->input('distributed') != null) {
+        $toEdit->notes = $request->input('distributed');
+      }
+      if ($request->input('status') != null) {
+        $toEdit->status = $request->input('status');
+      }
+      if ($request->input('updated_at') != null) {
+        $toEdit->updated_at = $request->input('updated_at');
+      }
+      if ($request->input('created_at') != null) {
+        $toEdit->created_at = $request->input('created_at');
+      }
+      $toEdit->save();
+      //dd($toEdit->toArray());
+      return json_encode(($toEdit->toArray()));
+    }
 }

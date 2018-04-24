@@ -26,4 +26,5 @@ Route::middleware(['authentication'])->group(function() {
   Route::get('/vbdb/autocomplete', 'InventoryController@autocomplete');
   Route::post('/vbdb/insert', 'InventoryController@insert');
   Route::get('/vbdb/delete/{id}', 'InventoryController@delete');
+  Route::get('/vbdb/edit/{id}', 'InventoryController@edit');
 });
